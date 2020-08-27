@@ -1,13 +1,21 @@
 <template>
-  <v-app id="inspire">
+  <v-app id="silicone-slice">
     <v-navigation-drawer v-model="drawer" app clipped>
       <v-list dense>
-        <v-list-item link>
+        <v-list-item link exact :to="{ name: 'home' }">
           <v-list-item-action>
             <v-icon>mdi-view-dashboard</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Dashboard</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link exact :to="{ name: 'import' }">
+          <v-list-item-action>
+            <v-icon>mdi-database-import</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Import</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item link>
@@ -32,7 +40,7 @@
 
     <v-app-bar app clipped-left>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>Application </v-toolbar-title>
+      <v-toolbar-title>Silicon Slice </v-toolbar-title>
       <v-spacer />
       <v-avatar size="38">
         <img
@@ -40,6 +48,7 @@
           :src="user.photoURL"
           :alt="user.displayName"
         />
+        <v-icon v-if="!user.photoURL" dark>mdi-account-circle</v-icon>
       </v-avatar>
     </v-app-bar>
 
@@ -47,30 +56,33 @@
       <slot />
     </v-main>
 
-    <v-footer app>
-      <span>&copy; NewCo {{ new Date().getFullYear() }}</span>
-    </v-footer>
+    <footer />
   </v-app>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import Footer from '@/components/app/Footer.vue'
 import { signOut, currentUser } from '@/firebase/auth'
 
-export default {
-  data: () => ({
-    drawer: null,
-    user: {}
-  }),
-  async created() {
+@Component({
+  components: {
+    Footer
+  }
+})
+export default class DefaultLayout extends Vue {
+  drawer = null
+  user: firebase.User | null = null
+
+  async created(): Promise<void> {
     this.user = await currentUser()
-  },
-  methods: {
-    async logout() {
-      await signOut()
-      this.$router.push({
-        name: 'login'
-      })
-    }
+  }
+
+  async logout(): Promise<void> {
+    await signOut()
+    this.$router.push({
+      name: 'login'
+    })
   }
 }
 </script>

@@ -1,18 +1,19 @@
 <template>
-  <layout-default>
+  <default-layout>
     <h1>Home</h1>
-  </layout-default>
+  </default-layout>
 </template>
 
-<script>
-import LayoutDefault from '../layouts/default.vue'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
-export default {
-  name: 'Home',
+@Component({
   components: {
-    LayoutDefault
+    DefaultLayout
   }
-}
+})
+export default class Home extends Vue {}
 </script>
 
 <style></style>

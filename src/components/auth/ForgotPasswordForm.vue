@@ -20,6 +20,9 @@
       </v-form>
     </v-card-text>
     <v-card-actions>
+      <v-btn text color="primary" @click="back">
+        Back to Login
+      </v-btn>
       <v-spacer />
       <v-btn
         v-if="message == ''"
@@ -31,45 +34,41 @@
       >
         Reset Password
       </v-btn>
-      <v-btn v-if="message != ''" text color="primary" @click="back">
-        Back to Login
-      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 import { sendPasswordResetEmail } from '@/firebase/auth'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      valid: true,
-      message: '',
-      form: {
-        email: ''
-      },
-      usernameRules: [
-        v => !!v || 'Please enter your email is required',
-        v => /.+@.+\..+/.test(v) || 'Email must be valid'
-      ]
+@Component
+export default class ForgotPasswordForm extends Vue {
+  loading = false
+  valid = true
+  message = ''
+  form = {
+    email: ''
+  }
+  usernameRules = [
+    (v: boolean | string) => !!v || 'Please enter your email is required',
+    (v: boolean | string) =>
+      /.+@.+\..+/.test(v as string) || 'Email must be valid'
+  ]
+
+  async reset(): Promise<void> {
+    this.loading = true
+    try {
+      await sendPasswordResetEmail(this.form.email)
+    } catch (error) {
+      console.log(error.code)
     }
-  },
-  methods: {
-    async reset() {
-      this.loading = true
-      try {
-        await sendPasswordResetEmail(this.form.email)
-      } catch (error) {
-        console.log(error.code)
-      }
-      this.message = 'Please check your email for further instruction.'
-      this.loading = false
-    },
-    back() {
-      this.$emit('back')
-    }
+    this.message = 'Please check your email for further instruction.'
+    this.loading = false
+  }
+
+  back(): void {
+    this.$emit('back')
   }
 }
 </script>

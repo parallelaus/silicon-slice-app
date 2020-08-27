@@ -44,47 +44,47 @@
   </v-card>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
 import { signInWithEmailAndPassword } from '@/firebase/auth'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      valid: true,
-      errorMessage: '',
-      form: {
-        email: '',
-        password: ''
-      },
-      usernameRules: [
-        v => !!v || 'Please enter your email is required',
-        v => /.+@.+\..+/.test(v) || 'Email must be valid'
-      ],
-      passwordRules: [v => !!v || 'Please enter your password']
-    }
-  },
-  methods: {
-    async login() {
-      this.loading = true
-      this.errorMessage = ''
+@Component
+export default class LoginForm extends Vue {
+  loading = false
+  valid = true
+  errorMessage = ''
+  form = {
+    email: '',
+    password: ''
+  }
 
-      try {
-        await signInWithEmailAndPassword(this.form)
-        this.$emit('login')
-      } catch (error) {
-        if (error.error == 'account-disabled') {
-          this.errorMessage =
-            'Your account has been disabled. Please contact accounts.'
-        } else {
-          this.errorMessage =
-            'Email and/or Password incorrect. Please try again.'
-          this.$refs.form.reset()
-        }
+  usernameRules = [
+    (v: boolean | string) => !!v || 'Please enter your email is required',
+    (v: boolean | string) =>
+      /.+@.+\..+/.test(v as string) || 'Email must be valid'
+  ]
+
+  passwordRules = [(v: boolean | string) => !!v || 'Please enter your password']
+
+  async login(): Promise<void> {
+    this.loading = true
+    this.errorMessage = ''
+
+    try {
+      await signInWithEmailAndPassword(this.form)
+      this.$emit('login')
+    } catch (error) {
+      if (error.error == 'account-disabled') {
+        this.errorMessage =
+          'Your account has been disabled. Please contact accounts.'
+      } else {
+        this.errorMessage = 'Email and/or Password incorrect. Please try again.'
+        // this.$refs.form.reset()
       }
-
-      this.loading = false
     }
+
+    this.loading = false
   }
 }
 </script>

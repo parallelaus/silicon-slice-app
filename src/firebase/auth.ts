@@ -43,7 +43,7 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
 /**
  *
  */
-export async function currentUser() {
+export async function currentUser(): Promise<firebase.User | null> {
   return new Promise((resolve, reject) => {
     const user = firebase.auth().currentUser
     if (user) {
