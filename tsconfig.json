@@ -9,6 +9,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",

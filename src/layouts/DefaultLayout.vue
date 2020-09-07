@@ -43,12 +43,8 @@
       <v-toolbar-title>Silicon Slice </v-toolbar-title>
       <v-spacer />
       <v-avatar size="38">
-        <img
-          v-if="user.photoURL"
-          :src="user.photoURL"
-          :alt="user.displayName"
-        />
-        <v-icon v-if="!user.photoURL" dark>mdi-account-circle</v-icon>
+        <img v-if="userPhoto != ''" :src="userPhoto" />
+        <v-icon v-if="userPhoto == ''" dark>mdi-account-circle</v-icon>
       </v-avatar>
     </v-app-bar>
 
@@ -56,7 +52,7 @@
       <slot />
     </v-main>
 
-    <footer />
+    <Footer />
   </v-app>
 </template>
 
@@ -83,6 +79,11 @@ export default class DefaultLayout extends Vue {
     this.$router.push({
       name: 'login'
     })
+  }
+
+  get userPhoto(): string {
+    if (this.user && this.user.photoURL) return this.user.photoURL
+    return ''
   }
 }
 </script>

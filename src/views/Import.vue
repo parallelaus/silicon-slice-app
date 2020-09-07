@@ -1,30 +1,42 @@
 <template>
   <default-layout>
-    <v-stepper>
-      <v-stepper-header>
-        <v-stepper-step step="1">
-          Upload File
-        </v-stepper-step>
+    <v-container>
+      <v-stepper v-model="step">
+        <v-stepper-header>
+          <v-stepper-step step="1" :complete="!!inputFileInfo">
+            Upload File
+          </v-stepper-step>
 
-        <v-divider></v-divider>
+          <v-divider></v-divider>
 
-        <v-stepper-step step="2">Name of step 2</v-stepper-step>
+          <v-stepper-step step="2" :editable="!!inputFileInfo">
+            Field Mapping
+          </v-stepper-step>
 
-        <v-divider></v-divider>
+          <v-divider></v-divider>
 
-        <v-stepper-step step="3">Name of step 3</v-stepper-step>
-      </v-stepper-header>
+          <v-stepper-step step="3" :editable="!!inputFileInfo">
+            Import Data
+          </v-stepper-step>
+        </v-stepper-header>
 
-      <v-stepper-items>
-        <v-stepper-content step="1">
-          <file-drop />
-        </v-stepper-content>
+        <v-stepper-items>
+          <v-stepper-content step="1">
+            <file-drop @files-selected="loadFile" />
+          </v-stepper-content>
 
-        <v-stepper-content step="2"> </v-stepper-content>
+          <v-stepper-content step="2">
+            <field-map
+              :input-file-info="inputFileInfo"
+              :output-schema="schema"
+              @change="updateMap"
+            />
+          </v-stepper-content>
 
-        <v-stepper-content step="3"> </v-stepper-content>
-      </v-stepper-items>
-    </v-stepper>
+          <v-stepper-content step="3"> </v-stepper-content>
+        </v-stepper-items>
+      </v-stepper>
+    </v-container>
   </default-layout>
 </template>
 
@@ -32,14 +44,42 @@
 import { Component, Vue } from 'vue-property-decorator'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import FileDrop from '@/components/import/FileDrop.vue'
+import FieldMap from '@/components/import/FieldMap.vue'
+import { getInputFileInfo } from '@/components/import/import'
+import schema from '@/components/import/schema'
 
 @Component({
   components: {
     DefaultLayout,
-    FileDrop
+    FileDrop,
+    FieldMap
   }
 })
-export default class Import extends Vue {}
+export default class Import extends Vue {
+  step = 1
+  inputFileInfo: Import.FileInfo | null = null
+  schema: Import.OutputSchema | null = null
+
+  async loadFile(files: FileList) {
+    try {
+      const inputFileInfo = await getInputFileInfo(files[0])
+      if (inputFileInfo) {
+        this.inputFileInfo = inputFileInfo
+        this.step = 2
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async created() {
+    this.schema = schema
+  }
+
+  updateMap(value: Import.FieldMap) {
+    console.log('Field Map', value)
+  }
+}
 </script>
 
 <style></style>
