@@ -1,8 +1,8 @@
 <template>
   <v-sheet
     ref="dropZone"
-    class="pa-2"
     width="100%"
+    height="400px"
     style="cursor:pointer; border-color:white; border-style: dashed"
     @click="clickFileUpload"
     @dragenter.prevent="dragover = true"
@@ -11,24 +11,40 @@
     @drop.prevent="dropFile"
   >
     <input type="file" multiple accept=".csv" style="display: none" />
-    <v-row justify="center">
-      <v-icon :color="dragover ? 'primary' : ''" size="75">
-        mdi-cloud-upload-outline
-      </v-icon>
-    </v-row>
-    <v-row justify="center">
-      <span class="title">Drag'n drop or click to upload file!</span>
-    </v-row>
+    <div v-if="!loading">
+      <v-row justify="center">
+        <v-icon :color="dragover ? 'primary' : ''" size="65">
+          mdi-cloud-upload-outline
+        </v-icon>
+      </v-row>
+      <v-row justify="center">
+        <span class="title text-primary"
+          >Drag'n drop or click to upload file!</span
+        >
+      </v-row>
+    </div>
+    <div v-if="loading">
+      <v-row justify="center">
+        <v-progress-circular
+          indeterminate
+          size="65"
+          width="6"
+          color="primary"
+        />
+      </v-row>
+    </div>
   </v-sheet>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Emit } from 'vue-property-decorator'
+import { Component, Vue, Emit, Prop } from 'vue-property-decorator'
 
 @Component
 export default class FileDrop extends Vue {
   dragover = false
   fileUpload: HTMLElement | null = null
+
+  @Prop({ required: false }) readonly loading!: boolean
 
   mounted() {
     this.fileUpload = this.$el.firstElementChild as HTMLElement
